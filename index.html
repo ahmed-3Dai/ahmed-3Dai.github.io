@@ -402,14 +402,14 @@
                     <!-- Featured animation projects -->
                     <div class="hero-stagewrap">
                         <div class="stage" id="heroStage" onclick="openHero()">
-                            <img class="layer is-on" id="heroLayerA" alt="" draggable="false" onerror="if(this.src.indexOf('maxresdefault')>-1)this.src=this.src.replace('maxresdefault','hqdefault')">
+                            <img class="layer is-on" id="heroLayerA" src="https://img.youtube.com/vi/efO_KkeeOJM/maxresdefault.jpg" alt="National day26" draggable="false" onerror="if(this.src.indexOf('maxresdefault')>-1)this.src=this.src.replace('maxresdefault','hqdefault')">
                             <img class="layer" id="heroLayerB" alt="" draggable="false" onerror="if(this.src.indexOf('maxresdefault')>-1)this.src=this.src.replace('maxresdefault','hqdefault')">
                             <div class="play-orb glass-btn text-white"><i class="fa-solid fa-play ms-0.5"></i></div>
                             <div class="stage-info">
                                 <div class="min-w-0">
                                     <div class="text-[11px] text-white/70 mb-1.5" data-i18n="heroFeatured">FEATURED ANIMATION</div>
-                                    <div id="heroSlideTitle" class="swap display text-[clamp(1.2rem,2.2vw,1.8rem)] text-white truncate"></div>
-                                    <div id="heroSlideRole" class="swap text-xs text-white/70 mt-1 truncate"></div>
+                                    <div id="heroSlideTitle" class="swap display text-[clamp(1.2rem,2.2vw,1.8rem)] text-white truncate">National day26</div>
+                                    <div id="heroSlideRole" class="swap text-xs text-white/70 mt-1 truncate">3D Animation · Motion Craft</div>
                                 </div>
                                 <button type="button" onclick="event.stopPropagation(); openHero()" class="btn-primary inline-flex px-5 py-2.5 text-xs shrink-0">
                                     <span data-i18n="heroWatch">WATCH PROJECT</span>
@@ -1455,6 +1455,10 @@ function openVideoModal(youtubeId, title) {
                         if (role_en && role_ar) CARD_AR[role_en] = role_ar;
                     });
                     if (freshProjects.length) {
+                        const natIdx = freshProjects.findIndex(fp => fp.youtubeId === (heroFirst || 'efO_KkeeOJM'));
+                        if (natIdx > 0) {
+                            freshProjects.unshift(freshProjects.splice(natIdx, 1)[0]);
+                        }
                         const liveKeys = new Set(freshProjects.map(fp => fp.mediaUrl || fp.image || ('id_' + fp.id)));
                         const liveYt = new Set(freshProjects.map(fp => fp.youtubeId).filter(Boolean));   // a video that is in the sheet always wins over a built-in copy
                         const remainingDriveProjects = projectsData.filter(p => !liveKeys.has(p.mediaUrl || p.image || ('id_' + p.id)) && !(p.youtubeId && liveYt.has(p.youtubeId)));
@@ -1545,7 +1549,7 @@ function openVideoModal(youtubeId, title) {
                     const row = setRows.find(r => String(r['setting key'] || '').trim() === 'hero_first');
                     const raw = row ? String(row['value (english)'] || '').trim() : '';
                     const hid = raw ? (extractYouTubeId(raw) || raw) : '';
-                    if (hid !== heroFirst) { heroFirst = hid; heroSig = ''; refreshHero(); }
+                    if (hid && hid !== heroFirst) { heroFirst = hid; heroSig = ''; refreshHero(); }
                 }
             } catch(e) {
                 console.warn("Live sync notice:", e);
@@ -1964,7 +1968,9 @@ function openVideoModal(youtubeId, title) {
         function heroPool() {
             let v = projectsData.filter(p => p.type === 'video' && p.category === 'motion');
             if (v.length < 2) v = projectsData.filter(p => p.type === 'video');
-            if (heroFirst) { const i = v.findIndex(p => p.youtubeId === heroFirst); if (i > 0) v.unshift(v.splice(i, 1)[0]); }
+            const targetId = heroFirst || 'efO_KkeeOJM';
+            const i = v.findIndex(p => p.youtubeId === targetId);
+            if (i > 0) v.unshift(v.splice(i, 1)[0]);
             return v.slice(0, 7);
         }
         function heroImage(it) { return it.thumbnail || (it.youtubeId ? 'https://img.youtube.com/vi/' + it.youtubeId + '/maxresdefault.jpg' : viewerItemImage(it)); }
